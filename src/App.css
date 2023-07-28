@@ -1,0 +1,129 @@
+.App {
+  text-align: center;
+  width: 100%;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+
+button {
+  background: linear-gradient(to right, #a864fd, #29cdff);
+  color: white;
+  border: none;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button[type=submit] {
+  background: linear-gradient(to right, #a864fd, #29cdff);
+
+}
+
+button[type=reset] {
+  background: linear-gradient(to right, #D31027 0%, #EA384D  51%, #D31027  100%);
+}
+
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.sequence-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); /* Chaque élément sera d'au moins 50px de large, et le nombre d'éléments par ligne s'adaptera à la largeur de l'écran */
+  justify-items: center; /* Centrer les éléments dans chaque cellule de la grille */
+  gap: 20px;
+  padding: 20px;
+}
+
+.sequence-item {
+  background-color: #007BFF;
+  color: white;
+  font-size: 36px;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+  flex-grow: 1;
+  min-width: calc(100% / 20);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sequence-item.entered-number {
+  background-color: #FFC107;
+
+}
+
+.user-sequence-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  justify-items: center;
+  gap: 10px;
+  padding: 20px;
+  }
+
+.number-pad {
+  justify-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  justify-content: center;
+  padding: 20px;
+  
+
+
+}
+
+.sequence-item.number-pad-item {
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px rgba(0, 0, 0, 0.2);
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  color: #333;
+}
+
+.sequence-item.number-pad-item:active {
+  background-color: #d4d4d4;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
