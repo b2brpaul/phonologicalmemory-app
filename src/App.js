@@ -91,7 +91,7 @@ function App() {
       <h1>Phonologic Memory Game</h1>
       <h2>Your Score: {score}</h2>
       <Confetti active={alertMessage === 'Correct!'} config={confettiConfig} />
-      <p> I want the sequence to be :
+      <p> Let's start. I want the sequence to be :
         <select value={numDigits} onChange={e => setNumDigits(Number(e.target.value))}>
           {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
             <option key={num} value={num}>{num}</option>
