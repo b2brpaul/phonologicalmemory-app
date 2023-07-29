@@ -130,10 +130,21 @@ function App() {
               key={0} 
               className="sequence-item number-pad-item" 
               onClick={() => handleClick(0)}
+
             >
+
               0
             </div>
+              <div 
+  key={"delete"} 
+  className="sequence-item number-pad-item delete"
+  onClick={() => setUserSequence(prevSequence => prevSequence.slice(0, -1))}
+>
+  Del
+</div>
             <div></div>
+        
+
           </div>
           <button type="submit" onClick={checkSequence}>Submit</button>
         </>
