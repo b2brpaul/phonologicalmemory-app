@@ -105,10 +105,13 @@ button[type=reset] {
 
 .sequence-item.entered-number {
   background-color: #FFC107;
-
+  height: 50px;
 }
 
 .user-sequence-container {
+
+  height: 200px; /* Ajustez la hauteur en fonction de vos besoins */
+  overflow-y: auto; /* Permet le défilement vertical */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   justify-items: center;

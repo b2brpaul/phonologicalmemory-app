@@ -112,7 +112,7 @@ function App() {
         </label>
         <p>- I want the sequence to be :&nbsp;
           <select value={numDigits} onChange={e => setNumDigits(Number(e.target.value))}>
-            {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
+            {Array.from({ length: 14 }, (_, i) => i + 5).map(num => (
               <option key={num} value={num}>{num}</option>
             ))}
           </select>
@@ -121,7 +121,7 @@ function App() {
         <p> 
           - I want the timer to be set to:&nbsp; 
           <select value={timerLength} onChange={e => setTimerLength(Number(e.target.value))}>
-            {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
+            {Array.from({ length: 14 }, (_, i) => i + 5).map(num => (
               <option key={num} value={num}>{num}</option>
             ))}
           </select> 
