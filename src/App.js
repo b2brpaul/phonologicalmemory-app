@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import logo from './logo.svg';
 import Confetti from 'react-dom-confetti';
+import Modal from 'react-modal';
 
 function App() {
+  const [timerLength, setTimerLength] = useState(10);
+  const submitRef = React.useRef(null);
   const [score, setScore] = useState(0);
   const [countdown, setCountdown] = useState(null);
-  const [numDigits, setNumDigits] = useState(10);
+  const [numDigits, setNumDigits] = useState(7);
   const [digitSequence, setDigitSequence] = useState([]);
   const [showSubmit, setShowSubmit] = useState(false);
   const [userSequence, setUserSequence] = useState([]);
   const [alertMessage, setAlertMessage] = useState("");
   const [reversedSequence, setReversedSequence] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const confettiConfig = {
     angle: 90,
     spread: 360,
@@ -30,41 +33,31 @@ function App() {
     const sequence = Array.from({ length: numDigits }, () => Math.floor(Math.random() * 10));
     setDigitSequence(sequence);
     setReversedSequence([...sequence].reverse());
-    setUserSequence(Array(numDigits).fill('-'));  // Initialise userSequence with dashes
-    setCountdown(10);
+    setCountdown(timerLength);
   }
 
-  function handleClick(num) {
-    setUserSequence(prevSequence => {
-      const index = prevSequence.indexOf('-');
-      if (index !== -1) {
-        return [...prevSequence.slice(0, index), num, ...prevSequence.slice(index + 1)];
-      }
-      return [...prevSequence, num];
-    });
+useEffect(() => {
+  if (digitSequence.length > 0) {
+    setCountdown(timerLength);
+    const timer = setTimeout(() => {
+      setDigitSequence([]);
+      setShowSubmit(true);
+    }, timerLength * 1000);
+    const countdownTimer = setInterval(() => {
+      setCountdown(prevCountdown => prevCountdown > 0 ? prevCountdown - 1 : 0);
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(countdownTimer);
+    };
   }
+}, [digitSequence]);
 
-  useEffect(() => {
-    if (digitSequence.length > 0) {
-      setCountdown(10);
-      const timer = setTimeout(() => {
-        setDigitSequence([]);
-        setShowSubmit(true);
-      }, 10000);
-      const countdownTimer = setInterval(() => {
-        setCountdown(prevCountdown => prevCountdown - 1);
-      }, 1000);
-      return () => {
-        clearTimeout(timer);
-        clearInterval(countdownTimer);
-      }
-    }
-  }, [digitSequence]);
-  useEffect(() => {
-  if (showSubmit) {
-    window.scrollTo(0, document.body.scrollHeight);
-    }
-  }, [showSubmit]);
+useEffect(() => {
+  if (countdown === 0 && submitRef.current) {
+    submitRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+}, [countdown]);
 
   function checkSequence() {
     if (userSequence.join(' ') !== reversedSequence.join(' ')) {
@@ -75,30 +68,54 @@ function App() {
     }
     setUserSequence([]);
     setShowSubmit(false);
+    setShowModal(true);
   }
 
   function resetGame() {
-    setNumDigits(10);
+    setNumDigits(7);
     setDigitSequence([]);
     setShowSubmit(false);
     setUserSequence([]);
     setAlertMessage("");
     setReversedSequence([]);
+    setShowModal(false);  // Add this line
+  }
+
+  function handleClick(num) {
+    if (userSequence.length < numDigits) {
+      setUserSequence(prevSequence => [...prevSequence, num]);
+    }
   }
 
   return (
     <div className="App">
       <h1>Phonologic Memory Game</h1>
       <h2>Your Score: {score}</h2>
+      <div className="confetti-container">
       <Confetti active={alertMessage === 'Correct!'} config={confettiConfig} />
-      <p> Let's start. I want the sequence to be :
+      </div>
+    <hr />
+      <p> Let's start by configuring the game :</p> 
+
+      <p>I want the sequence to be :&nbsp;
         <select value={numDigits} onChange={e => setNumDigits(Number(e.target.value))}>
           {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
             <option key={num} value={num}>{num}</option>
           ))}
         </select>
-         numbers long
+         &nbsp;numbers long
       </p>
+
+      <p> 
+        I want the timer to be set to:&nbsp; 
+        <select value={timerLength} onChange={e => setTimerLength(Number(e.target.value))}>
+          {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
+            <option key={num} value={num}>{num}</option>
+          ))}
+        </select> 
+        &nbsp;seconds
+      </p>
+    <hr />
       <p>Click "Generate Sequence" to start. A random sequence of numbers will be shown. Memorize this sequence, as it will disappear after 10 seconds. You will then have to enter the sequence in reverse.</p>
       <button onClick={generateSequence}>Generate Sequence</button>
       <p>Time left: {countdown}</p>
@@ -109,7 +126,7 @@ function App() {
       </div>
       {showSubmit && (
         <>
-              <p>Enter the sequence now:</p>
+          <p>Enter the sequence now:</p>
           <div className="user-sequence-container">
             {userSequence.map((num, i) => (
               <div key={i} className="sequence-item entered-number">{num}</div>
@@ -130,30 +147,30 @@ function App() {
               key={0} 
               className="sequence-item number-pad-item" 
               onClick={() => handleClick(0)}
-
             >
-
               0
             </div>
-              <div 
-  key={"delete"} 
-  className="sequence-item number-pad-item delete"
-  onClick={() => setUserSequence(prevSequence => prevSequence.slice(0, -1))}
->
-  Del
-</div>
+            <div 
+              key={"delete"} 
+              className="sequence-item number-pad-item delete"
+              onClick={() => setUserSequence(prevSequence => prevSequence.slice(0, -1))}
+            >
+              Del
+            </div>
             <div></div>
-        
-
           </div>
-          <button type="submit" onClick={checkSequence}>Submit</button>
-        </>
+          
+          <button type="submit" onClick={checkSequence} ref={submitRef}>Submit</button>
+          </>
+          
       )}
-      {alertMessage && (
-        <>
+      
+      {showModal && (
+        <Modal isOpen={showModal} onRequestClose={() => setShowModal(false)}>
+          <h2>Résultats</h2>
           <p>{alertMessage}</p>
           <button type="reset" onClick={resetGame}>Try again ↺</button>
-        </>
+        </Modal>
       )}
     </div>
   );

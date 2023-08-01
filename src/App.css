@@ -15,6 +15,8 @@
 }
 
 
+
+
 button {
   background: linear-gradient(to right, #a864fd, #29cdff);
   color: white;
@@ -35,9 +37,24 @@ button[type=submit] {
 }
 
 button[type=reset] {
-  background: linear-gradient(to right, #D31027 0%, #EA384D  51%, #D31027  100%);
+  background: linear-gradient(to right, #10d385 0%, #10d385  51%, #10d385  100%);
+  border: none;
+  padding: 15px 70px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+
 }
 
+
+.confetti-container {
+  position: relative;
+  z-index: 10000;
+}
 
 .App-header {
   background-color: #282c34;
@@ -62,8 +79,8 @@ button[type=reset] {
   background-color: #007BFF;
   color: white;
   font-size: 36px;
-  padding: 20px;
-  margin: 10px;
+  padding: 10px;
+  margin: 5px;
   border-radius: 10px;
   flex-grow: 1;
   min-width: calc(100% / 20);
