@@ -4,6 +4,7 @@ import Confetti from 'react-dom-confetti';
 import Modal from 'react-modal';
 
 function App() {
+  const [name, setName] = useState("");
   const [timerLength, setTimerLength] = useState(10);
   const submitRef = React.useRef(null);
   const [score, setScore] = useState(0);
@@ -90,13 +91,16 @@ useEffect(() => {
   return (
     <div className="App">
       <h1>Phonologic Memory Game</h1>
-      <h2>Your Score: {score}</h2>
+      <h2>{name}, your score: {score}</h2>
       <div className="confetti-container">
       <Confetti active={alertMessage === 'Correct!'} config={confettiConfig} />
       </div>
     <hr />
       <p> Let's start by configuring the game :</p> 
-
+<label>
+  Name: 
+  <input type="text" value={name} onChange={e => setName(e.target.value)} />
+</label>
       <p>I want the sequence to be :&nbsp;
         <select value={numDigits} onChange={e => setNumDigits(Number(e.target.value))}>
           {Array.from({ length: 16 }, (_, i) => i + 5).map(num => (
