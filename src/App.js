@@ -4,6 +4,8 @@ import Confetti from 'react-dom-confetti';
 import Modal from 'react-modal';
 
 function App() {
+  const [enteredSequence, setEnteredSequence] = useState([]);
+  const [errorIndex, setErrorIndex] = useState(null);
   const [name, setName] = useState("");
   const [timerLength, setTimerLength] = useState(10);
   const submitRef = React.useRef(null);
@@ -69,16 +71,19 @@ function App() {
   }, [countdown]);
 
   function checkSequence() {
-    if (userSequence.join(' ') !== reversedSequence.join(' ')) {
-      setAlertMessage(`Incorrect, try again. Expected sequence was: ${reversedSequence.join(' ')}`);
-    } else {
-      setAlertMessage('Correct!');
-      setScore(prevScore => prevScore + numDigits - 4);
-    }
-    setUserSequence([]);
-    setShowSubmit(false);
-    setShowModal(true);
+  const incorrectIndex = userSequence.findIndex((digit, i) => digit !== reversedSequence[i]);
+  if (incorrectIndex !== -1) {
+    setAlertMessage(`Incorrect, try again. Expected sequence was: ${reversedSequence.join(' ')}`);
+    setErrorIndex(incorrectIndex);
+  } else {
+    setAlertMessage('Correct!');
+    setScore(prevScore => prevScore + numDigits - 4);
   }
+  setEnteredSequence([...userSequence]);
+  setUserSequence([]);
+  setShowSubmit(false);
+  setShowModal(true);
+}
 
   function resetGame() {
     setNumDigits(7);
@@ -88,6 +93,8 @@ function App() {
     setAlertMessage("");
     setReversedSequence([]);
     setShowModal(false);
+    setErrorIndex(null);
+
   }
 
   function handleClick(num) {
@@ -143,7 +150,7 @@ function App() {
       {showSubmit && (
         <>
           <p>Enter the sequence now:</p>
-          <div className="user-sequence-container">
+          <div className="user-sequence-container" style={{ height: `${numDigits * 15}px` }}>
             {userSequence.map((num, i) => (
               <div key={i} className="sequence-item entered-number">{num}</div>
             ))}
@@ -179,12 +186,26 @@ function App() {
         </>
       )}
       {showModal && (
-        <Modal isOpen={showModal} onRequestClose={() => setShowModal(false)}>
-          <h2>Résultats</h2>
-          <p>{alertMessage}</p>
-          <button type="reset" onClick={resetGame}>Try again ↺</button>
-        </Modal>
-      )}
+  <Modal isOpen={showModal} onRequestClose={() => setShowModal(false)}>
+    <h2>Résultats</h2>
+    {/* Affichez un message différent en fonction du succès ou de l'échec */}
+    {alertMessage === 'Correct!' ? (
+      <>
+        <p>Congrats {name}! You won!</p>
+        <Confetti active={alertMessage === 'Correct!'} config={confettiConfig} />
+      </>
+    ) : (
+      <>
+        <p>Sorry {name}, you made a mistake. Try again!</p>
+        <p>Your sequence :</p>
+        <p>{enteredSequence.join(' ')}</p>
+        <p>Correct sequence :</p>
+        <p>{reversedSequence.join(' ')}</p>
+      </>
+    )}
+    <button type="reset" onClick={resetGame}>Try again ↺</button>
+  </Modal>
+)}
     </div>
   );
 }
