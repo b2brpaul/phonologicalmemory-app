@@ -26,6 +26,59 @@ const confettiConfig = {
   colors: ['#a864fd', '#29cdff', '#78ff44', '#ff718d', '#fdff6a'],
 };
 
+// ── Memory technique tips keyed by digit count ───────────────────────────
+const MEMORY_TIPS = [
+  {
+    minDigits: 5, maxDigits: 6,
+    label: 'Chunking',
+    hint: 'Group into chunks of 2–3',
+    detail: [
+      'Split the sequence into small groups of 2–3 digits (e.g., "47·29·1").',
+      'Say each chunk like a word — "forty-seven", "twenty-nine", "one".',
+      'To recall in reverse: reverse each chunk, then say the chunks in reverse order.',
+      'With only 5–6 digits, one confident read-through is usually enough.',
+    ],
+  },
+  {
+    minDigits: 7, maxDigits: 9,
+    label: 'Rhythm & Melody',
+    hint: 'Give the digits a beat',
+    detail: [
+      'Read the sequence with a rhythmic pattern — group into "3–2–2" chunks.',
+      'Stress the first digit of each group, like a song lyric.',
+      'Tap a finger for each digit as you memorize to reinforce the rhythm.',
+      'To recall in reverse: replay the melody backwards in your mind.',
+    ],
+  },
+  {
+    minDigits: 10, maxDigits: 12,
+    label: 'Number–Image Story',
+    hint: 'Turn digits into a vivid story',
+    detail: [
+      'Assign each digit an image: 0=sun, 1=candle, 2=swan, 3=heart, 4=sailboat, 5=hook, 6=elephant, 7=cliff, 8=snowman, 9=balloon.',
+      'Chain the images into a brief story as you read the digits.',
+      'To recall in reverse: rewind the story scene by scene.',
+      'Tip: work in pairs — "14" = candle + sailboat = "candle on a boat".',
+    ],
+  },
+  {
+    minDigits: 13, maxDigits: 18,
+    label: 'Memory Palace',
+    hint: 'Place digits in a familiar space',
+    detail: [
+      'Picture a familiar route: front door → hallway → kitchen → living room…',
+      'Place each chunk of 2–3 digits as a vivid object at each location.',
+      'To recall in reverse: mentally walk the route backwards, collecting each object.',
+      'The more bizarre or exaggerated the image, the easier it sticks.',
+    ],
+  },
+];
+
+function getTipForDigits(n) {
+  return MEMORY_TIPS.find(t => n >= t.minDigits && n <= t.maxDigits)
+    || MEMORY_TIPS[MEMORY_TIPS.length - 1];
+}
+
 function App() {
   const [name, setName] = useState('');
   const [timerLength, setTimerLength] = useState(10);
@@ -50,6 +103,8 @@ function App() {
   const [errorIndex, setErrorIndex] = useState(null);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
+  const [showTips, setShowTips] = useState(false);
+
   const submitRef = useRef(null);
   const sequenceRef = useRef(null);
 
@@ -65,7 +120,6 @@ function App() {
       } else if (e.key === 'Backspace') {
         setUserSequence(prev => prev.slice(0, -1));
       } else if (e.key === 'Enter') {
-        // Delegate to submit button; disabled attribute prevents premature submit
         if (submitRef.current && !submitRef.current.disabled) {
           submitRef.current.click();
         }
@@ -167,6 +221,8 @@ function App() {
   const timerPct = (countdown !== null && timerLength > 0)
     ? (countdown / timerLength) * 100 : 100;
   const barColor = timerPct > 50 ? '#10d385' : timerPct > 25 ? '#FFC107' : '#ff4444';
+  const activePreset = PRESETS.find(p => p.digits === numDigits && p.timer === timerLength) ?? null;
+  const currentTip = getTipForDigits(numDigits);
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -180,8 +236,11 @@ function App() {
         <span className="score-item">
           Best: <strong>{bestScore} pts</strong>
         </span>
-        <span className="score-item">
-          Streak: <strong>{streak} 🔥</strong>
+        <span
+          className="score-item score-item--streak"
+          data-active={streak > 1 ? 'true' : 'false'}
+        >
+          Streak: <strong>{streak} {streak > 0 ? '🔥' : '—'}</strong>
         </span>
       </div>
 
@@ -208,7 +267,7 @@ function App() {
           {PRESETS.map(p => (
             <button
               key={p.label}
-              className="preset-btn"
+              className={`preset-btn${activePreset?.label === p.label ? ' preset-btn--active' : ''}`}
               onClick={() => { setNumDigits(p.digits); setTimerLength(p.timer); }}
             >
               {p.label}
@@ -233,6 +292,27 @@ function App() {
               ))}
             </select>
           </label>
+        </div>
+
+        {/* ── Memory Tips panel ── */}
+        <div className="tips-section">
+          <button
+            className="tips-toggle"
+            onClick={() => setShowTips(v => !v)}
+            aria-expanded={showTips}
+          >
+            💡 Memory technique for this level {showTips ? '▲' : '▼'}
+          </button>
+          {showTips && (
+            <div className="tips-content">
+              <span className="tips-level-label">{currentTip.label}</span>
+              <ul className="tips-list">
+                {currentTip.detail.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
@@ -266,8 +346,17 @@ function App() {
       {/* ── Digit sequence display ── */}
       <div className="sequence-container" ref={sequenceRef}>
         {digitSequence.map((digit, i) => (
-          <div key={i} className="sequence-item">{digit}</div>
+          <div
+            key={i}
+            className="sequence-item"
+            style={{ animationDelay: `${i * 0.06}s` }}
+          >
+            {digit}
+          </div>
         ))}
+        {isPlaying && (
+          <p className="ingame-tip">💡 {currentTip.hint}</p>
+        )}
       </div>
 
       {/* ── Input phase ── */}
@@ -305,7 +394,7 @@ function App() {
         <Modal
           isOpen={showModal}
           onRequestClose={resetGame}
-          className="result-modal"
+          className={`result-modal${isCorrect ? ' result-modal--success' : ' result-modal--failure'}`}
           overlayClassName="modal-overlay"
         >
           <h2>{isCorrect ? '🎉 Correct!' : '❌ Incorrect'}</h2>
@@ -355,6 +444,10 @@ function App() {
                   ))}
                 </div>
               </div>
+
+              <p className="modal-tip">
+                Try: <strong>{currentTip.label}</strong> — {currentTip.hint}. Tap "Memory technique" before your next attempt.
+              </p>
             </div>
           )}
 
