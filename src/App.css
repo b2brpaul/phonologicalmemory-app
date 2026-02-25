@@ -1,4 +1,40 @@
+/* ── CSS Custom Properties ──────────────────────────────────────────────── */
+:root {
+  /* Brand palette */
+  --color-primary-start: #a864fd;
+  --color-primary-end:   #29cdff;
+  --color-success-start: #10d385;
+  --color-success-end:   #0aaa69;
+  --color-danger:        #ff4444;
+  --color-danger-dark:   #cc0000;
+  --color-warning:       #FFC107;
+  --color-accent-blue:   #007BFF;
+  --color-streak:        #ff8c00;
+
+  /* Neutrals */
+  --color-surface:       #f4f4f8;
+  --color-border:        #ccc;
+  --color-border-light:  #ddd;
+  --color-text-main:     #333;
+  --color-text-muted:    #555;
+  --color-text-faint:    #777;
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-pill: 20px;
+
+  /* Shadows */
+  --shadow-card:  0 2px 8px rgba(0,0,0,0.10);
+  --shadow-modal: 0 8px 32px rgba(0,0,0,0.22);
+}
+
 /* ── Base ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .App {
   text-align: center;
   width: 100%;
@@ -12,11 +48,15 @@ h1 {
   font-size: 1.5rem;
   margin-bottom: 4px;
   margin-top: 8px;
+  background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 hr {
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--color-border-light);
   margin: 8px 0;
 }
 
@@ -24,16 +64,29 @@ hr {
 .score-bar {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  font-size: 0.88rem;
-  padding: 4px 0 2px;
+  padding: 6px 0 4px;
 }
 
 .score-item {
-  background: #f4f4f8;
-  border-radius: 8px;
-  padding: 3px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-pill);
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-card);
+}
+
+.score-item strong {
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+}
+
+.score-item--streak[data-active="true"] {
+  background: linear-gradient(to right, #fff5e6, #ffe8b3);
+  border-color: var(--color-streak);
 }
 
 /* ── Confetti container ────────────────────────────────────────────────── */
@@ -57,9 +110,9 @@ hr {
 
 .input-text input[type="text"] {
   padding: 3px 7px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
 }
 
 .config-row {
@@ -71,9 +124,9 @@ hr {
 
 select {
   padding: 3px 7px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
 }
 
 /* ── Preset buttons ────────────────────────────────────────────────────── */
@@ -88,11 +141,11 @@ select {
 
 .preset-btn {
   background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
   padding: 4px 12px;
   font-size: 0.8rem;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -101,29 +154,105 @@ select {
   background: #e0e0e0;
 }
 
+.preset-btn--active {
+  background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+  color: white;
+  border-color: var(--color-primary-start);
+  font-weight: 600;
+}
+
 /* ── Main generate button ──────────────────────────────────────────────── */
-button:not(.preset-btn):not(.pad-btn):not(.reset-btn) {
-  background: linear-gradient(to right, #a864fd, #29cdff);
+button:not(.preset-btn):not(.pad-btn):not(.reset-btn):not(.tips-toggle) {
+  background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
   color: white;
   border: none;
   padding: 10px 24px;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   margin: 6px 4px;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, filter 0.15s, transform 0.12s, box-shadow 0.15s;
 }
 
-button:not(.preset-btn):not(.pad-btn):not(.reset-btn):disabled {
+button:not(.preset-btn):not(.pad-btn):not(.reset-btn):not(.tips-toggle):hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(168, 100, 253, 0.35);
+}
+
+button:not(.preset-btn):not(.pad-btn):not(.reset-btn):not(.tips-toggle):active:not(:disabled) {
+  transform: translateY(0px);
+  filter: brightness(0.97);
+}
+
+button:not(.preset-btn):not(.pad-btn):not(.reset-btn):not(.tips-toggle):disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+/* ── Memory Tips panel ─────────────────────────────────────────────────── */
+.tips-section {
+  width: 100%;
+  max-width: 480px;
+  margin: 4px auto 0;
+  text-align: left;
+}
+
+.tips-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tips-toggle:hover {
+  background: var(--color-surface);
+  color: var(--color-text-main);
+}
+
+.tips-content {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-top: 4px;
+  background: #fafafa;
+  font-size: 0.85rem;
+}
+
+.tips-level-label {
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0 0 6px;
+  font-size: 0.88rem;
+  display: block;
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-muted);
+}
+
+.tips-list li {
+  margin-bottom: 5px;
+  line-height: 1.45;
+}
+
+.tips-list li:last-child {
+  margin-bottom: 0;
 }
 
 /* ── Explain text ──────────────────────────────────────────────────────── */
 .explain-text {
   font-style: italic;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-muted);
   margin-bottom: 0;
 }
 
@@ -133,7 +262,7 @@ button:not(.preset-btn):not(.pad-btn):not(.reset-btn):disabled {
 
 kbd {
   background: #eee;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 1px 5px;
   font-family: monospace;
@@ -153,13 +282,13 @@ kbd {
   flex: 1;
   height: 12px;
   background: #e0e0e0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .timer-bar-fill {
   height: 100%;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: width 0.9s linear, background-color 0.5s;
 }
 
@@ -176,22 +305,43 @@ kbd {
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-  padding: 12px 8px;
+  padding: 12px 8px 4px;
   min-height: 62px;
 }
 
+@keyframes digitPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .sequence-item {
-  background-color: #007BFF;
+  background-color: var(--color-accent-blue);
   color: white;
   font-size: 1.6rem;
   font-weight: bold;
   width: 46px;
   height: 46px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  animation: digitPop 0.18s ease-out both;
+}
+
+.ingame-tip {
+  width: 100%;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--color-text-faint);
+  font-style: italic;
+  margin: 0 0 4px;
 }
 
 /* ── User input display ────────────────────────────────────────────────── */
@@ -202,7 +352,7 @@ kbd {
 
 .progress-hint {
   font-size: 0.82rem;
-  color: #777;
+  color: var(--color-text-faint);
   margin-bottom: 4px;
 }
 
@@ -216,8 +366,8 @@ kbd {
 }
 
 .sequence-item.entered-number {
-  background-color: #FFC107;
-  color: #333;
+  background-color: var(--color-warning);
+  color: var(--color-text-main);
   font-size: 1.5rem;
   width: 44px;
   height: 44px;
@@ -237,11 +387,11 @@ kbd {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   background: #f5f5f5;
   font-size: 1.3rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-main);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -262,24 +412,24 @@ kbd {
 }
 
 .pad-btn.del-btn {
-  background: #ff4444;
+  background: var(--color-danger);
   color: white;
-  border-color: #cc0000;
+  border-color: var(--color-danger-dark);
 }
 
 .pad-btn.del-btn:hover {
-  background: #cc0000;
+  background: var(--color-danger-dark);
 }
 
 .pad-btn.submit-pad-btn {
-  background: linear-gradient(135deg, #10d385, #0aaa69);
+  background: linear-gradient(135deg, var(--color-success-start), var(--color-success-end));
   color: white;
-  border-color: #0aaa69;
+  border-color: var(--color-success-end);
   font-size: 1.5rem;
 }
 
 .pad-btn.submit-pad-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0aaa69, #087a4d);
+  background: linear-gradient(135deg, var(--color-success-end), #087a4d);
 }
 
 .pad-btn.submit-pad-btn:disabled {
@@ -303,13 +453,13 @@ kbd {
 
 .result-modal {
   background: white;
-  border-radius: 16px;
-  padding: 24px 24px;
+  border-radius: var(--radius-lg);
+  padding: 24px;
   max-width: 480px;
   width: 90%;
   outline: none;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow-modal);
 }
 
 .result-modal h2 {
@@ -318,22 +468,42 @@ kbd {
   margin-bottom: 8px;
 }
 
+.result-modal--success h2 {
+  font-size: 1.8rem;
+  background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .modal-body p {
   margin: 4px 0;
   font-size: 0.95rem;
 }
 
 .points-earned {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
-  color: #10d385;
+  color: var(--color-success-start);
   margin-top: 8px !important;
+  letter-spacing: 0.03em;
 }
 
 .streak-badge {
   font-size: 1rem;
-  color: #ff8c00;
+  color: var(--color-streak);
   font-weight: bold;
+}
+
+.modal-tip {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  text-align: left;
 }
 
 /* ── Comparison (on incorrect) ─────────────────────────────────────────── */
@@ -351,7 +521,7 @@ kbd {
   min-width: 100px;
   text-align: right;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-muted);
 }
 
 .comparison-seq {
@@ -366,11 +536,11 @@ kbd {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 1.1rem;
   font-weight: bold;
   background: #f0f0f0;
-  color: #333;
+  color: var(--color-text-main);
 }
 
 .cmp-digit.right {
@@ -380,8 +550,8 @@ kbd {
 
 .cmp-digit.wrong {
   background: #ffd4d4;
-  color: #cc0000;
-  border: 2px solid #cc0000;
+  color: var(--color-danger-dark);
+  border: 2px solid var(--color-danger-dark);
 }
 
 .cmp-digit.expected {
@@ -392,12 +562,12 @@ kbd {
 
 /* ── Reset / try again button ──────────────────────────────────────────── */
 .reset-btn {
-  background: linear-gradient(to right, #10d385, #0aaa69);
+  background: linear-gradient(to right, var(--color-success-start), var(--color-success-end));
   color: white;
   border: none;
   padding: 10px 32px;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   margin-top: 12px;
   transition: opacity 0.2s;
@@ -407,19 +577,77 @@ kbd {
   opacity: 0.88;
 }
 
-/* ── Small screen tweaks ───────────────────────────────────────────────── */
-@media (max-width: 420px) {
-  h1 { font-size: 1.25rem; }
+/* ── Tablet (768px) ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .App {
+    padding: 0 12px 16px;
+  }
 
+  .result-modal {
+    width: 94%;
+    padding: 20px 16px;
+  }
+
+  .tips-content {
+    font-size: 0.83rem;
+  }
+}
+
+/* ── Mobile (480px) ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.2rem;
+    margin-top: 6px;
+  }
+
+  /* Prevent iOS input zoom — 16px minimum */
+  input[type="text"],
+  select {
+    font-size: 16px !important;
+  }
+
+  .score-bar {
+    gap: 5px;
+  }
+
+  .score-item {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+  }
+
+  /* Touch targets: 44px minimum */
+  .preset-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 0.85rem;
+  }
+
+  .tips-toggle {
+    min-height: 44px;
+    font-size: 0.85rem;
+  }
+
+  select {
+    min-height: 44px;
+    padding: 6px 8px;
+  }
+
+  input[type="text"] {
+    min-height: 44px;
+    padding: 6px 10px;
+  }
+
+  /* Number pad: fill width on small screens */
   .number-pad {
-    grid-template-columns: repeat(3, 52px);
-    gap: 6px;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 240px;
+    gap: 8px;
   }
 
   .pad-btn {
-    width: 52px;
-    height: 52px;
-    font-size: 1.2rem;
+    width: 100%;
+    height: 62px;
+    font-size: 1.3rem;
   }
 
   .sequence-item {
@@ -432,5 +660,20 @@ kbd {
     width: 38px;
     height: 38px;
     font-size: 1.3rem;
+  }
+
+  .cmp-digit {
+    width: 28px;
+    height: 28px;
+    font-size: 0.95rem;
+  }
+
+  .comparison-label {
+    min-width: 80px;
+    font-size: 0.78rem;
+  }
+
+  .tips-list {
+    font-size: 0.82rem;
   }
 }
