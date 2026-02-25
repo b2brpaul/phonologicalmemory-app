@@ -666,16 +666,15 @@ kbd {
     padding: 6px 10px;
   }
 
-  /* Number pad: fill width on small screens */
+  /* Number pad: fixed square buttons so border-radius:50% stays circular */
   .number-pad {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 240px;
-    gap: 8px;
+    grid-template-columns: repeat(3, 64px);
+    gap: 10px;
   }
 
   .pad-btn {
-    width: 100%;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     font-size: 1.3rem;
   }
 
