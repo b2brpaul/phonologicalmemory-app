@@ -160,12 +160,12 @@ function App() {
     };
   }, [digitSequence, timerLength]);
 
-  // ── Scroll to numpad when timer expires ─────────────────────────────────
+  // ── Scroll to top when input phase begins so the prompt is visible ──────
   useEffect(() => {
-    if (countdown === 0 && submitRef.current) {
-      submitRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (showSubmit) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [countdown]);
+  }, [showSubmit]);
 
   // ── Check the user's answer ──────────────────────────────────────────────
   function checkSequence() {
@@ -226,7 +226,7 @@ function App() {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="App">
+    <div className="App" data-input-active={showSubmit ? 'true' : 'false'}>
       <h1>Phonologic Memory Game</h1>
 
       <div className="score-bar">
@@ -359,9 +359,9 @@ function App() {
         )}
       </div>
 
-      {/* ── Input phase ── */}
+      {/* ── Input phase (fixed overlay at bottom) ── */}
       {showSubmit && (
-        <>
+        <div className="input-overlay">
           <p className="enter-prompt">Enter the sequence in <strong>reverse order</strong>:</p>
           <p className="progress-hint">{userSequence.length} / {numDigits} digits entered</p>
 
@@ -386,7 +386,7 @@ function App() {
               ✓
             </button>
           </div>
-        </>
+        </div>
       )}
 
       {/* ── Result modal ── */}
